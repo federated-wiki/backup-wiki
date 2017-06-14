@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+timestamp=$(date +%F_%H-%M)
+while read p; do
+  wget -O $timestamp-$p-backup.json http://$p/system/export.json
+done
