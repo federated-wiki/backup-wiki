@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+timestamp=$(date +%F_%H-%M)
+mkdir -p pages && cd pages
+while read p; do
+  mkdir -p $p && cd $p
+  echo $timestamp-$p-pages
+  curl -s http://$p/system/sitemap.json | jq ".[]|.slug" | cut -d "\"" -f 2 > $timestamp-$p.pages
+  while read q; do
+    echo $timestamp-$p-$q
+    curl -s http://$p/$q.json > $timestamp-$p-$q.json
+  done < $timestamp-$p.pages
+  tar -czvf $timestamp-$p.pages.tgz $timestamp-$p-*
+  rm -rf $timestamp-$p-*
+  cd ..
+done
