@@ -2,5 +2,6 @@
 timestamp=$(date +%F_%H-%M)
 mkdir -p sites
 while read p; do
+  echo job: $timestamp site: $p
   curl -s http://$p/system/export.json | gzip > sites/$timestamp-$p-backup.json.gz
 done
