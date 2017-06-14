@@ -6,7 +6,7 @@ timestamp() {
 
 process_site() {
   echo job: $1 site: $2 get: list of pages
-  curl -s http://$2/system/sitemap.json | jq ".[]|.slug" | cut -d "\"" -f 2 > $1-$2.pages
+  curl -sL http://$2/system/sitemap.json | jq ".[]|.slug" | cut -d "\"" -f 2 > $1-$2.pages
   while read q; do
     process_page $1 $2 $q
   done < $1-$2.pages
@@ -16,7 +16,7 @@ process_site() {
 
 process_page() {
     echo job: $1 site: $2 get: $3
-    curl -s http://$2/$3.json > $1-$2-$3.json
+    curl -sL http://$2/$3.json > $1-$2-$3.json
 }
 
 mkdir -p pages && cd pages
