@@ -1,15 +1,28 @@
 #!/usr/bin/env bash
-timestamp=$(date +%F_%H-%M)
+
+timestamp() {
+  date +%F_%H-%M-%S
+}
+
+process_site() {
+  echo job: $1 site: $2 get: list of pages
+  curl -s http://$2/system/sitemap.json | jq ".[]|.slug" | cut -d "\"" -f 2 > $1-$2.pages
+  while read q; do
+    process_page $1 $2 $q
+  done < $1-$2.pages
+  tar -czf $1-$2.pages.tgz $1-$2-*
+  rm -rf $1-$2-*
+}
+
+process_page() {
+    echo job: $1 site: $2 get: $3
+    curl -s http://$2/$3.json > $1-$2-$3.json
+}
+
 mkdir -p pages && cd pages
 while read p; do
   mkdir -p $p && cd $p
-  echo job: $timestamp site: $p get: list of pages
-  curl -s http://$p/system/sitemap.json | jq ".[]|.slug" | cut -d "\"" -f 2 > $timestamp-$p.pages
-  while read q; do
-    echo job: $timestamp site: $p get: $q
-    curl -s http://$p/$q.json > $timestamp-$p-$q.json
-  done < $timestamp-$p.pages
-  tar -czf $timestamp-$p.pages.tgz $timestamp-$p-*
-  rm -rf $timestamp-$p-*
+  echo $(timestamp)
+  process_site $(timestamp) $p
   cd ..
 done
