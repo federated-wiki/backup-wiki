@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 timestamp=$(date +%F_%H-%M)
+mkdir -p sites
 while read p; do
-  curl http://$p/system/export.json | gzip > $timestamp-$p-backup.json.gz
+  curl -s http://$p/system/export.json | gzip > sites/$timestamp-$p-backup.json.gz
 done
